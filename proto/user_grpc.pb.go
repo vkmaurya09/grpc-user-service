@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_GetUser_FullMethodName    = "/user.UserService/GetUser"
-	UserService_GetUsers_FullMethodName   = "/user.UserService/GetUsers"
-	UserService_SearchUser_FullMethodName = "/user.UserService/SearchUser"
-	UserService_CreateUser_FullMethodName = "/user.UserService/CreateUser"
+	UserService_GetUser_FullMethodName        = "/user.UserService/GetUser"
+	UserService_GetUsers_FullMethodName       = "/user.UserService/GetUsers"
+	UserService_CreateUser_FullMethodName     = "/user.UserService/CreateUser"
+	UserService_SearchUserById_FullMethodName = "/user.UserService/SearchUserById"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -31,8 +31,8 @@ const (
 type UserServiceClient interface {
 	GetUser(ctx context.Context, in *UserIdReq, opts ...grpc.CallOption) (*UserResp, error)
 	GetUsers(ctx context.Context, in *UserIdsReq, opts ...grpc.CallOption) (*UsersResp, error)
-	SearchUser(ctx context.Context, in *SearchReq, opts ...grpc.CallOption) (*UsersResp, error)
 	CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*UserIdResp, error)
+	SearchUserById(ctx context.Context, in *SearchReq, opts ...grpc.CallOption) (*UsersResp, error)
 }
 
 type userServiceClient struct {
@@ -61,18 +61,18 @@ func (c *userServiceClient) GetUsers(ctx context.Context, in *UserIdsReq, opts .
 	return out, nil
 }
 
-func (c *userServiceClient) SearchUser(ctx context.Context, in *SearchReq, opts ...grpc.CallOption) (*UsersResp, error) {
-	out := new(UsersResp)
-	err := c.cc.Invoke(ctx, UserService_SearchUser_FullMethodName, in, out, opts...)
+func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*UserIdResp, error) {
+	out := new(UserIdResp)
+	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*UserIdResp, error) {
-	out := new(UserIdResp)
-	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, opts...)
+func (c *userServiceClient) SearchUserById(ctx context.Context, in *SearchReq, opts ...grpc.CallOption) (*UsersResp, error) {
+	out := new(UsersResp)
+	err := c.cc.Invoke(ctx, UserService_SearchUserById_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +85,8 @@ func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserReq, o
 type UserServiceServer interface {
 	GetUser(context.Context, *UserIdReq) (*UserResp, error)
 	GetUsers(context.Context, *UserIdsReq) (*UsersResp, error)
-	SearchUser(context.Context, *SearchReq) (*UsersResp, error)
 	CreateUser(context.Context, *CreateUserReq) (*UserIdResp, error)
+	SearchUserById(context.Context, *SearchReq) (*UsersResp, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -100,11 +100,11 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *UserIdReq) (*Use
 func (UnimplementedUserServiceServer) GetUsers(context.Context, *UserIdsReq) (*UsersResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsers not implemented")
 }
-func (UnimplementedUserServiceServer) SearchUser(context.Context, *SearchReq) (*UsersResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchUser not implemented")
-}
 func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserReq) (*UserIdResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedUserServiceServer) SearchUserById(context.Context, *SearchReq) (*UsersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchUserById not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -155,24 +155,6 @@ func _UserService_GetUsers_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_SearchUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).SearchUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_SearchUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).SearchUser(ctx, req.(*SearchReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUserReq)
 	if err := dec(in); err != nil {
@@ -187,6 +169,24 @@ func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).CreateUser(ctx, req.(*CreateUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_SearchUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).SearchUserById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_SearchUserById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).SearchUserById(ctx, req.(*SearchReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -207,12 +207,12 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetUsers_Handler,
 		},
 		{
-			MethodName: "SearchUser",
-			Handler:    _UserService_SearchUser_Handler,
-		},
-		{
 			MethodName: "CreateUser",
 			Handler:    _UserService_CreateUser_Handler,
+		},
+		{
+			MethodName: "SearchUserById",
+			Handler:    _UserService_SearchUserById_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

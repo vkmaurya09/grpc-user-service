@@ -7,11 +7,12 @@ package user;
 service UserService {
 	rpc GetUser(UserIdReq) returns (UserResp);
 	rpc GetUsers(UserIdsReq) returns (UsersResp);
-	rpc SearchUser(SearchReq) returns (UsersResp);
 	rpc CreateUser(CreateUserReq) returns (UserIdResp);
+	rpc SearchUserById(SearchReq) returns (UsersResp);
+
+
 
 }
-
 
 message UserIdReq {
 	int32 id = 1;
@@ -25,13 +26,6 @@ message UserIdsReq {
 	repeated int32 ids = 1;
 }
 
-
-message SearchReq {
-	int64 phone = 1;
-	string city = 2;
-	bool married = 3;
-  }
-  
 message CreateUserReq {
 	string fname = 2;
 	string city = 3;
@@ -48,8 +42,20 @@ message UserResp {
 	int64 phone = 4;
 	float height = 5;
 	bool married = 6;
-  }
+}
   
 message UsersResp {
 	repeated UserResp users = 1;
-  }
+}
+
+
+message SearchReq {
+    oneof field {
+        int32 id = 1;
+        string fname = 2;
+        string city = 3;
+        string phone = 4;
+        int32 height = 5;
+        bool married = 6;
+    }
+}
