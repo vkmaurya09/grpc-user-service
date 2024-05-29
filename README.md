@@ -77,4 +77,13 @@ cd test
 go test ./...
 ```
 
+### Docker
+
+```sh
+
+ - Build
+    docker build -t user-service:latest .
+
+ - Run
+    docker run -p 50051:50051 user-service
 
