@@ -8,10 +8,7 @@ service UserService {
 	rpc GetUser(UserIdReq) returns (UserResp);
 	rpc GetUsers(UserIdsReq) returns (UsersResp);
 	rpc CreateUser(CreateUserReq) returns (UserIdResp);
-	rpc SearchUserById(SearchReq) returns (UsersResp);
-
-
-
+	rpc SearchUser(SearchReq) returns (UsersResp);
 }
 
 message UserIdReq {
@@ -30,7 +27,7 @@ message CreateUserReq {
 	string fname = 2;
 	string city = 3;
 	int64 phone = 4;
-	float height = 5;
+	string height = 5;
 	bool married = 6;
   }
   
@@ -40,7 +37,7 @@ message UserResp {
 	string fname = 2;
 	string city = 3;
 	int64 phone = 4;
-	float height = 5;
+	string height = 5;
 	bool married = 6;
 }
   
@@ -50,12 +47,12 @@ message UsersResp {
 
 
 message SearchReq {
-    oneof field {
+    oneof search_field {
         int32 id = 1;
         string fname = 2;
         string city = 3;
-        string phone = 4;
-        int32 height = 5;
+        int64 phone = 4;
+        string height = 5;
         bool married = 6;
     }
 }

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/grpc-user-service/models"
 	"github.com/grpc-user-service/proto"
@@ -16,11 +15,11 @@ type UserService struct {
 
 	Users  map[int32]models.User
 	lastID int32
-	mu     sync.Mutex
 }
 
 func NewUserService() *UserService {
 	return &UserService{
+		repo:   repository.NewUserRepository(),
 		Users:  make(map[int32]models.User),
 		lastID: 0,
 	}
@@ -28,7 +27,6 @@ func NewUserService() *UserService {
 
 func (s *UserService) CreateUser(ctx context.Context, req *proto.CreateUserReq) (*proto.UserIdResp, error) {
 	user := models.User{
-		ID:      s.lastID,
 		FName:   req.Fname,
 		City:    req.City,
 		Phone:   req.Phone,
@@ -80,8 +78,9 @@ func (s *UserService) GetUsers(ctx context.Context, req *proto.UserIdsReq) (*pro
 	}, nil
 }
 
-func (s *UserService) searchUsers(ctx context.Context, field string, value interface{}) (*proto.UsersResp, error) {
-	users, err := s.repo.SearchUsersByField(field, value)
+func (s *UserService) searchUsers(field string, value interface{}) (*proto.UsersResp, error) {
+	fmt.Println(1)
+	users, err := s.repo.SearchUser(field, value)
 	if err != nil {
 		return nil, err
 	}
@@ -100,20 +99,21 @@ func (s *UserService) searchUsers(ctx context.Context, field string, value inter
 	return &proto.UsersResp{Users: protoUsers}, nil
 }
 
-func (s *UserService) SearchUsers(ctx context.Context, req *proto.SearchReq) (*proto.UsersResp, error) {
-	switch req.Field.(type) {
+func (s *UserService) SearchUser(ctx context.Context, req *proto.SearchReq) (*proto.UsersResp, error) {
+
+	switch req.SearchField.(type) {
 	case *proto.SearchReq_Id:
-		return s.searchUsers(ctx, "ID", req.GetId())
+		return s.searchUsers("ID", req.GetId())
 	case *proto.SearchReq_Fname:
-		return s.searchUsers(ctx, "FName", req.GetFname())
+		return s.searchUsers("FName", req.GetFname())
 	case *proto.SearchReq_City:
-		return s.searchUsers(ctx, "City", req.GetCity())
+		return s.searchUsers("City", req.GetCity())
 	case *proto.SearchReq_Phone:
-		return s.searchUsers(ctx, "Phone", req.GetPhone())
+		return s.searchUsers("Phone", req.GetPhone())
 	case *proto.SearchReq_Height:
-		return s.searchUsers(ctx, "Height", req.GetHeight())
+		return s.searchUsers("Height", req.GetHeight())
 	case *proto.SearchReq_Married:
-		return s.searchUsers(ctx, "Married", req.GetMarried())
+		return s.searchUsers("Married", req.GetMarried())
 	default:
 		return nil, fmt.Errorf("invalid search field")
 	}

@@ -11,6 +11,7 @@ import (
 
 func main() {
 	userService := service.NewUserService()
+
 	grpcServer := grpc.NewServer()
 	proto.RegisterUserServiceServer(grpcServer, userService)
 

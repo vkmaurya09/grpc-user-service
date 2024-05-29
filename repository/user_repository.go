@@ -11,7 +11,7 @@ type UserRepository interface {
 	CreateUser(user models.User) (int32, error)
 	GetUser(id int32) (models.User, error)
 	GetUsers(ids []int32) ([]models.User, error)
-	SearchUsersByField(field string, value interface{}) ([]models.User, error)
+	SearchUser(field string, value interface{}) ([]models.User, error)
 }
 
 type InMemoryUserRepository struct {
@@ -20,7 +20,7 @@ type InMemoryUserRepository struct {
 	mu     sync.Mutex
 }
 
-func NewInMemoryUserRepository() *InMemoryUserRepository {
+func NewUserRepository() *InMemoryUserRepository {
 	return &InMemoryUserRepository{
 		users:  make(map[int32]models.User),
 		lastID: 0,
@@ -61,7 +61,7 @@ func (r *InMemoryUserRepository) GetUsers(ids []int32) ([]models.User, error) {
 	return users, nil
 }
 
-func (r *InMemoryUserRepository) SearchUsersByField(field string, value interface{}) ([]models.User, error) {
+func (r *InMemoryUserRepository) SearchUser(field string, value interface{}) ([]models.User, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -85,7 +85,7 @@ func (r *InMemoryUserRepository) SearchUsersByField(field string, value interfac
 				users = append(users, user)
 			}
 		case "Height":
-			if height, ok := value.(float32); ok && user.Height == height {
+			if height, ok := value.(string); ok && user.Height == height {
 				users = append(users, user)
 			}
 		case "Married":
